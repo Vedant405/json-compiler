@@ -1,0 +1,7 @@
+{
+  "name": "Alice",
+  "age": 25,  
+  "isStudent": "true",
+  "scores": [95, "88", 92],
+}
+

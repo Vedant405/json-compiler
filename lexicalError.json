@@ -1,0 +1,11 @@
+{
+    "name": "Alice",
+    "age": 25,
+    "age": 30, 
+    //"isStudent": treu, 
+    "scores": [95, 88, , 92], 
+    "address": { "city": "New York", "zip": 10001, "zip": 10002 }, 
+    //"@invalidKey": "error",  
+    "details": { "height": 5.9.2 }
+}
+
