@@ -4,7 +4,7 @@
 
 This project is a **JSON Compiler** that performs **lexical, syntactic, and semantic analysis** on JSON input. It detects errors, generates an **Abstract Syntax Tree (AST)**, performs **semantic validation**, and produces an **Intermediate Representation (IR)** for further processing.
 
-![Alt text]([https://example.com/image.png](https://preview.redd.it/dogrvclkll0a1.png?auto=webp&s=72e05d2cea869d6b1218193a947efb316c1c01b0))
+![mem](json.jpg)
 
 ## Features
 
