@@ -15,6 +15,7 @@ This project is a **JSON Compiler** that performs **lexical, syntactic, and sema
 ---
 
 ## Project Structure
+```plaintext
 📦 json-compiler 
 ├── 📜 json_main.cpp     > Main entry point of the compiler 
 ├── 📜 json_lexer.h      > Header file for lexical analysis 
@@ -27,6 +28,7 @@ This project is a **JSON Compiler** that performs **lexical, syntactic, and sema
 ├── 📜 wrong.json        > JSON file with lexical, syntax, and semantic errors 
 ├── 📜 README.md         > Project documentation 
 └── 📜 Makefile          > Build automation
+```
 
 ---
 
