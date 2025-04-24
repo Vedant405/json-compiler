@@ -49,5 +49,23 @@ struct ASTArray : ASTNode {
     }
 };
 
+// Specialized ASTValue subclasses for type inference
+struct ASTString : ASTValue {
+    using ASTValue::ASTValue;
+};
+
+struct ASTNumber : ASTValue {
+    using ASTValue::ASTValue;
+};
+
+struct ASTBool : ASTValue {
+    using ASTValue::ASTValue;
+};
+
+struct ASTNull : ASTValue {
+    using ASTValue::ASTValue;
+};
+
+
 #endif // JSON_AST_H
 

@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include "json_lexer.h"
-#include "json_ast.h"  // Include the new AST header
+#include "json_ast.h"
 
 using namespace std;
 
@@ -11,6 +11,7 @@ class Parser {
 private:
     vector<Token> tokens;
     int index = 0;
+    bool hasError = false; // Track if any syntax error occurred
 
     Token currentToken() {
         return (index < tokens.size()) ? tokens[index] : Token(TokenType::END_OF_FILE, "EOF", -1, -1);
@@ -22,22 +23,25 @@ private:
 
     void error(const string& message) {
         Token t = currentToken();
-        cerr << "Syntax Error: " << message << " at Line " << t.line << " Column " << t.column << endl;
-        advance();
+        cerr << "Syntax Error: " << message << " at Line " << t.line << ", Column " << t.column << endl;
+        hasError = true; // Mark error occurred
+        advance();       // Attempt recovery
     }
 
     shared_ptr<ASTNode> parseValue() {
         Token t = currentToken();
-        if (t.type == TokenType::STRING || t.type == TokenType::NUMBER ||
-            t.type == TokenType::BOOLEAN || t.type == TokenType::NUL) {
-            advance();
-            return make_shared<ASTValue>(t.value);
-        } else if (t.type == TokenType::LEFT_BRACE) {
+
+        if (t.type == TokenType::LEFT_BRACE) {
             return parseObject();
         } else if (t.type == TokenType::LEFT_BRACKET) {
             return parseArray();
+        } else if (t.type == TokenType::STRING || t.type == TokenType::NUMBER ||
+                   t.type == TokenType::BOOLEAN || t.type == TokenType::NUL) {
+            advance();
+            return make_shared<ASTValue>(t.value);
         }
-        error("Invalid JSON Value");
+
+        error("Invalid JSON value");
         return nullptr;
     }
 
@@ -50,6 +54,7 @@ private:
                 error("Expected a string key in object");
                 break;
             }
+
             string key = currentToken().value;
             advance(); // Consume key
 
@@ -60,7 +65,9 @@ private:
             advance(); // Consume ':'
 
             auto value = parseValue();
-            if (value) obj->properties.emplace_back(key, value);
+            if (value) {
+                obj->properties.emplace_back(key, value);
+            }
 
             if (currentToken().type == TokenType::COMMA) {
                 advance(); // Consume ',' and continue
@@ -85,7 +92,9 @@ private:
 
         while (currentToken().type != TokenType::RIGHT_BRACKET && currentToken().type != TokenType::END_OF_FILE) {
             auto value = parseValue();
-            if (value) arr->elements.push_back(value);
+            if (value) {
+                arr->elements.push_back(value);
+            }
 
             if (currentToken().type == TokenType::COMMA) {
                 advance(); // Consume ',' and continue
@@ -106,6 +115,16 @@ private:
 
 public:
     Parser(const vector<Token>& tokens) : tokens(tokens) {}
-    shared_ptr<ASTNode> parse() { return parseValue(); }
+
+    shared_ptr<ASTNode> parse() {
+        auto root = parseValue();
+
+        if (hasError || !root) {
+            cerr << "Parsing failed due to syntax errors.\n";
+            return nullptr;
+        }
+
+        return root;
+    }
 };
 

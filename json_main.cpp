@@ -2,15 +2,13 @@
 #include "json_lexer.h"
 #include "json_parser.cpp"
 #include "json_semantic.cpp"
-#include "json_ir.h" // Use only the header file
+#include "json_ir.h" // Use only the header
+#include "json_bytecode.h"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    // Check if a filename was provided as a command-line argument.
-    // If not, default to "wrong.json"
     string filename = (argc > 1) ? argv[1] : "wrong.json";
-    
     string jsonInput = readFile(filename);
 
     Lexer lexer(jsonInput);
@@ -22,7 +20,7 @@ int main(int argc, char* argv[]) {
     for (const Token& token : tokens) {
         token.print();
         if (token.type == TokenType::ERROR) {
-            cerr << "Lexical Error: " << token.value 
+            cerr << "Lexical Error: " << token.value
                  << " at line " << token.line << ", column " << token.column << endl;
             hasLexicalError = true;
         }
@@ -53,12 +51,10 @@ int main(int argc, char* argv[]) {
     }
 
     cout << "\nGenerating Intermediate Representation (IR)...\n";
-    cout << "IR Type: " << ir->type << "\nProperties: ";
-    for (const auto& prop : ir->properties) {
-        cout << prop << " ";
-    }
-    cout << endl;
+    ir->generateIntermediateCode(cout);  // Pretty-printed JSON format
+
+    cout << "\nGenerating Bytecode...\n";
+    BytecodeGenerator::generate(ast, cout);
 
     return 0;
 }
-

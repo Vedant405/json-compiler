@@ -1,5 +1,5 @@
 #include "json_ast.h"
-#include "json_ir.h"  // Include IR generation
+#include "json_ir.h"
 #include <iostream>
 #include <memory>
 #include <set>
@@ -7,8 +7,12 @@
 using namespace std;
 
 class SemanticAnalyzer {
+    bool semanticError = false; // Track semantic errors
+
 public:
     shared_ptr<IRSchema> analyze(shared_ptr<ASTNode> root) {
+        semanticError = false;
+
         if (!root) {
             cerr << "Semantic Error: AST is empty or invalid." << endl;
             return nullptr;
@@ -17,7 +21,11 @@ public:
         cout << "\nPerforming Semantic Analysis...\n";
         checkNode(root);
 
-        // If no errors, generate IR
+        if (semanticError) {
+            cerr << "Semantic analysis failed. IR generation skipped.\n";
+            return nullptr;
+        }
+
         return generateIR(root);
     }
 
@@ -37,6 +45,7 @@ private:
         for (const auto& prop : obj->properties) {
             if (keys.count(prop.first)) {
                 cerr << "Semantic Error: Duplicate key '" << prop.first << "' found." << endl;
+                semanticError = true;
             }
             keys.insert(prop.first);
             checkNode(prop.second);
@@ -50,7 +59,9 @@ private:
             if (firstType.empty()) {
                 firstType = elemType;
             } else if (elemType != firstType) {
-                cerr << "Semantic Error: Inconsistent types in array. Expected all '" << firstType << "', but found '" << elemType << "'." << endl;
+                cerr << "Semantic Error: Inconsistent types in array. Expected all '" << firstType
+                     << "', but found '" << elemType << "'." << endl;
+                semanticError = true;
             }
             checkNode(elem);
         }
@@ -77,7 +88,6 @@ private:
         return !str.empty() && str.find_first_not_of("0123456789.-") == string::npos;
     }
 
-    // **New Function: Convert AST to IR**
     shared_ptr<IRSchema> generateIR(shared_ptr<ASTNode> root) {
         return IRGenerator::generate(root);
     }
